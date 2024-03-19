@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "foreignKeys"
+}
+
+enum ERole {
+  ADMIN
+  CUSTOMER
+}
+
+enum EDiscountStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+enum EOrderStatus {
+  CREATED
+  PENDING_PAYMENT
+  PROCESSING
+  SHIPPING
+  DELIVERED
+  CANCELED
+  RETURNED
+}
+
+enum EPaymentMethod {
+  COD
+  BANK_TRANSFER
+}
+
+enum EPaymentStatus {
+  SUCCESS
+  FAILED
+  PROCESSING
+  NOT_CREATED
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value ERole  @default(CUSTOMER)
+  User  User[]
+}
+
+model Author {
+  id   Int    @id @default(autoincrement())
+  name String
+  Book Book[]
+}
+
+model Publisher {
+  id   Int    @id @default(autoincrement())
+  name String
+  Book Book[]
+}
+
+model Book {
+  id                  Int            @id @default(autoincrement())
+  isbn                String
+  name                String
+  price               Int
+  available_quantity  Int
+  year_of_publication Int
+  image_url           String
+  author_id           Int
+  author              Author         @relation(fields: [author_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  publisher_id        Int
+  publisher           Publisher      @relation(fields: [publisher_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Review              Review[]
+  Order_detail        Order_detail[]
+}
+
+model User {
+  id              Int               @id @default(autoincrement())
+  name            String
+  phone_number    String
+  user_name       String
+  password        String
+  address         String
+  role_id         Int
+  role            Role              @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Review          Review[]
+  Order           Order[]
+  UserRelDiscount UserRelDiscount[]
+}
+
+model Review {
+  id             Int      @id @default(autoincrement())
+  review_content String
+  review_date    DateTime
+  rating         Int
+  user_id        Int
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  book_id        Int
+  book           Book     @relation(fields: [book_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Discount {
+  id                       Int               @id @default(autoincrement())
+  name                     String
+  value                    Int
+  number_of_uses_remaining Int               @default(1)
+  start_date               DateTime
+  end_date                 DateTime
+  status                   EDiscountStatus   @default(INACTIVE)
+  Order                    Order[]
+  UserRelDiscount          UserRelDiscount[]
+}
+
+model Order {
+  id           Int            @id @default(autoincrement())
+  order_date   DateTime
+  status       EOrderStatus   @default(CREATED)
+  discount_id  Int
+  discount     Discount       @relation(fields: [discount_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id      Int
+  user         User           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Order_detail Order_detail[]
+  Payment      Payment[]
+}
+
+model Order_detail {
+  id       Int   @id @default(autoincrement())
+  book_id  Int
+  book     Book  @relation(fields: [book_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  order_id Int
+  order    Order @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  amount   Int
+}
+
+model UserRelDiscount {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  discount_id Int
+  discount    Discount @relation(fields: [discount_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Payment {
+  id                Int            @id @default(autoincrement())
+  payment_date_time DateTime
+  payment_method    EPaymentMethod @default(COD)
+  payment_status    EPaymentStatus @default(NOT_CREATED)
+  order_id          Int
+  order             Order          @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
