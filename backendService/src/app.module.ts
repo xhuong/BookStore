@@ -2,7 +2,8 @@ import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UsersModule } from "./users/users.module";
-// import { AuthModule } from "./auth/auth.module";
+import { AuthModule } from "./auth/auth.module";
+import { BookModule } from "./book/book.module";
 import { DatabaseModule } from "./database/database.module";
 // import { RoleModule } from "./role/role.module";
 import { PrismaModule } from "./prisma/prisma.module";
@@ -27,12 +28,16 @@ import { ConfigModule } from "@nestjs/config";
 // import { PatientModule } from "./patient/patient.module";
 // import { AppointmentsModule } from "./appointments/appointments.module";
 // import { PharmacistModule } from "./pharmacist/pharmacist.module";
+import { RoleModule } from "./role/role.module";
+import { AuthorModule } from './author/author.module';
+import { PublisherModule } from './publisher/publisher.module';
 
 @Module({
   imports: [
     UsersModule,
-    // AuthModule,
+    AuthModule,
     DatabaseModule,
+    BookModule,
     // RoleModule,
     PrismaModule,
     // DepartmentModule,
@@ -49,6 +54,10 @@ import { ConfigModule } from "@nestjs/config";
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    RoleModule,
+    BookModule,
+    AuthorModule,
+    PublisherModule,
     // AdminModule,
     // DoctorModule,
     // PatientModule,
@@ -69,16 +78,7 @@ export class AppModule implements NestModule {
     consumer
       .apply(RBACMiddleware)
       .forRoutes
-      // "user",
-      // "room",
-      // "medical",
-      // "medical-record",
-      // "prescription",
-      // "service",
-      // "bed",
-      // "health-insurance-card",
-      // "service-rel-medical-examination",
-      // "prescription-rel-medical",
+      // "user"
       ();
   }
 }

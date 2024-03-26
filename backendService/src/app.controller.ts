@@ -18,6 +18,4 @@ export class AppController {
     const phone = prefix.concat(data.phone);
     return await this.appService.verifyOtp(phone, data.otp);
   }
-
-  // @Post("/getAppointmentsForPatient")
 }

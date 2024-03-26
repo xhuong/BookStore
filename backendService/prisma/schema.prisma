@@ -62,7 +62,7 @@ model Publisher {
 
 model Book {
   id                  Int            @id @default(autoincrement())
-  isbn                String
+  isbn                String         @unique
   name                String
   price               Int
   available_quantity  Int
