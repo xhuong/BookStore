@@ -31,6 +31,12 @@ import { ConfigModule } from "@nestjs/config";
 import { RoleModule } from "./role/role.module";
 import { AuthorModule } from './author/author.module';
 import { PublisherModule } from './publisher/publisher.module';
+import { ReviewModule } from './review/review.module';
+import { OrderModule } from './order/order.module';
+import { OrderDetailModule } from './order-detail/order-detail.module';
+import { PaymentModule } from './payment/payment.module';
+import { DiscountModule } from './discount/discount.module';
+import { UserRelDiscountModule } from './user_rel_discount/user_rel_discount.module';
 
 @Module({
   imports: [
@@ -58,6 +64,12 @@ import { PublisherModule } from './publisher/publisher.module';
     BookModule,
     AuthorModule,
     PublisherModule,
+    ReviewModule,
+    OrderModule,
+    OrderDetailModule,
+    PaymentModule,
+    DiscountModule,
+    UserRelDiscountModule,
     // AdminModule,
     // DoctorModule,
     // PatientModule,
