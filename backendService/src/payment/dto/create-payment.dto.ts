@@ -1,27 +1,15 @@
-import { IsDateString, IsEnum, IsNumber } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export enum EPaymentMethod {
-  BANK_TRANSFER = "BANK_TRANSFER",
   COD = "COD",
-}
-
-export enum EPaymentStatus {
-  SUCCESS = "SUCCESS",
-  FAILED = "FAILED",
-  PROCESSING = "PROCESSING",
-  NOT_CREATED = "NOT_CREATED",
+  BANK_TRANSFER = "BANK_TRANSFER",
 }
 
 export class CreatePaymentDto {
-  @IsDateString()
-  payment_date_time: Date;
+  @IsString()
+  @IsNotEmpty()
+  payment_name: string;
 
   @IsEnum(EPaymentMethod, { message: "Invalid payment method" })
   payment_method: EPaymentMethod;
-
-  @IsEnum(EPaymentStatus, { message: "Invalid payment status" })
-  payment_status: EPaymentStatus;
-
-  @IsNumber()
-  order_id: number;
 }

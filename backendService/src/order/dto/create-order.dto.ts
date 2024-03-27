@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from "class-validator";
 
@@ -31,8 +32,8 @@ export class CreateOrderDto {
   user_id: number;
 
   @IsNumber()
-  @IsNotEmpty()
-  discount_id: number;
+  @IsOptional()
+  discount_id?: number;
 
   @IsNumber()
   @IsNotEmpty()
