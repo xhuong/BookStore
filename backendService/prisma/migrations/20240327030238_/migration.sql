@@ -2,7 +2,7 @@
 CREATE TABLE `Role` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `value` ENUM('AMDIN', 'CUSTOMER') NOT NULL DEFAULT 'CUSTOMER',
+    `value` ENUM('ADMIN', 'CUSTOMER') NOT NULL DEFAULT 'CUSTOMER',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -35,6 +35,7 @@ CREATE TABLE `Book` (
     `author_id` INTEGER NOT NULL,
     `publisher_id` INTEGER NOT NULL,
 
+    UNIQUE INDEX `Book_isbn_key`(`isbn`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -79,9 +80,9 @@ CREATE TABLE `Discount` (
 -- CreateTable
 CREATE TABLE `Order` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `order_date` DATETIME(3) NOT NULL,
+    `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `status` ENUM('CREATED', 'PENDING_PAYMENT', 'PROCESSING', 'SHIPPING', 'DELIVERED', 'CANCELED', 'RETURNED') NOT NULL DEFAULT 'CREATED',
-    `discount_id` INTEGER NOT NULL,
+    `discount_id` INTEGER NULL,
     `user_id` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -109,9 +110,8 @@ CREATE TABLE `UserRelDiscount` (
 -- CreateTable
 CREATE TABLE `Payment` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `payment_date_time` DATETIME(3) NOT NULL,
+    `payment_name` VARCHAR(191) NOT NULL,
     `payment_method` ENUM('COD', 'BANK_TRANSFER') NOT NULL DEFAULT 'COD',
-    `payment_status` ENUM('SUCCESS', 'FAILED', 'PROCESSING', 'NOT_CREATED') NOT NULL DEFAULT 'NOT_CREATED',
     `order_id` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -151,4 +151,4 @@ ALTER TABLE `UserRelDiscount` ADD CONSTRAINT `UserRelDiscount_user_id_fkey` FORE
 ALTER TABLE `UserRelDiscount` ADD CONSTRAINT `UserRelDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -18,7 +18,6 @@ export enum EOrderStatus {
 }
 
 export class CreateOrderDto {
-  @IsString()
   @IsDateString()
   @IsNotEmpty()
   order_date: Date;
@@ -28,12 +27,12 @@ export class CreateOrderDto {
   status: EOrderStatus;
 
   @IsNumber()
-  @IsNotEmpty()
-  user_id: number;
-
-  @IsNumber()
   @IsOptional()
   discount_id?: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  user_id: number;
 
   @IsNumber()
   @IsNotEmpty()

@@ -15,8 +15,7 @@ export class BookService {
           isbn: createBookDto.isbn,
         },
       });
-
-      if (!book.isbn) {
+      if (!book || !book.isbn) {
         const data = await this.prisma.book.create({
           data: createBookDto,
         });
