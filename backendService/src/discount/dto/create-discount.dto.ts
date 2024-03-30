@@ -22,11 +22,11 @@ export class CreateDiscountDto {
 
   @IsDateString()
   @IsNotEmpty()
-  start_date: Date;
+  start_time: Date;
 
   @IsDateString()
   @IsNotEmpty()
-  end_date: Date;
+  end_time: Date;
 
   @IsNumber()
   @IsNotEmpty()

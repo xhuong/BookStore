@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export enum EPaymentMethod {
   COD = "COD",
@@ -12,7 +12,4 @@ export class CreatePaymentDto {
 
   @IsEnum(EPaymentMethod, { message: "Invalid payment method" })
   payment_method: EPaymentMethod;
-
-  @IsNumber()
-  order_id: number;
 }

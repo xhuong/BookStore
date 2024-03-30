@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsString,
 } from "class-validator";
 
 export enum EOrderStatus {
@@ -33,8 +32,4 @@ export class CreateOrderDto {
   @IsNumber()
   @IsNotEmpty()
   user_id: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  payment_id: number;
 }

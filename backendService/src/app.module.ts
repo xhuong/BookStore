@@ -37,6 +37,7 @@ import { OrderDetailModule } from './order-detail/order-detail.module';
 import { PaymentModule } from './payment/payment.module';
 import { DiscountModule } from './discount/discount.module';
 import { UserRelDiscountModule } from './user_rel_discount/user_rel_discount.module';
+import { OrderRelPaymentModule } from './order_rel_payment/order_rel_payment.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { UserRelDiscountModule } from './user_rel_discount/user_rel_discount.mod
     PaymentModule,
     DiscountModule,
     UserRelDiscountModule,
+    OrderRelPaymentModule,
     // AdminModule,
     // DoctorModule,
     // PatientModule,

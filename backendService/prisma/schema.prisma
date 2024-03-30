@@ -106,8 +106,8 @@ model Discount {
   name                     String
   value                    Int
   number_of_uses_remaining Int               @default(1)
-  start_date               DateTime
-  end_date                 DateTime
+  start_time               DateTime
+  end_time                 DateTime
   status                   EDiscountStatus   @default(INACTIVE)
   Order                    Order[]
   UserRelDiscount          UserRelDiscount[]
@@ -150,9 +150,10 @@ model Payment {
 }
 
 model OrderRelPayment {
-  id         Int     @id @default(autoincrement())
   order_id   Int
   order      Order   @relation(fields: [order_id], references: [id])
   payment_id Int
   payment    Payment @relation(fields: [payment_id], references: [id])
+
+  @@id([order_id, payment_id])
 }
