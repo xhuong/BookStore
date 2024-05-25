@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsDateString, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateBookDto {
   @IsString()
@@ -24,4 +24,29 @@ export class CreateBookDto {
 
   @IsNumber()
   publisher_id: number;
+
+  @IsDateString()
+  date_added: Date;
+}
+
+export class PayloadSearchBookDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsNumber()
+  @IsOptional()
+  min_price?: number;
+
+  @IsNumber()
+  @IsOptional()
+  max_price?: number;
+
+  @IsNumber()
+  @IsOptional()
+  author_id?: number;
+
+  @IsNumber()
+  @IsOptional()
+  publisher_id?: number;
 }

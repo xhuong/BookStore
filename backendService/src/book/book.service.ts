@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateBookDto } from "./dto/create-book.dto";
+import { CreateBookDto, PayloadSearchBookDto } from "./dto/create-book.dto";
 import { UpdateBookDto } from "./dto/update-book.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Response } from "express";
@@ -40,9 +40,40 @@ export class BookService {
     }
   }
 
-  async findAll(response: Response) {
+  async findAll(payload: PayloadSearchBookDto, response: Response) {
+    let { name, author_id, publisher_id, max_price, min_price } = payload;
+    console.log("payload", payload);
+
+    let condition: any = {};
+    if (name) {
+      condition.name = {
+        contains: name,
+      };
+    }
+    if (author_id) {
+      condition.author_id = {
+        equals: author_id,
+      };
+    }
+    if (publisher_id) {
+      condition.publisher_id = {
+        equals: publisher_id,
+      };
+    }
+    if (min_price && max_price) {
+      condition.price = {
+        gte: min_price,
+        lte: max_price,
+      };
+    }
     try {
-      const data = await this.prisma.book.findMany();
+      const data = await this.prisma.book.findMany({
+        include: {
+          author: true,
+          publisher: true,
+        },
+        where: condition,
+      });
       return response.status(200).json({
         status: 200,
         message: "Get list of books successfully",
@@ -58,24 +89,52 @@ export class BookService {
     }
   }
 
-  async findOne(title: string, response: Response) {
+  async findOne(id: number, response: Response) {
     try {
       const data = await this.prisma.book.findFirst({
         where: {
-          name: title,
+          id,
+        },
+        include: {
+          author: true,
+          publisher: true,
         },
       });
       return response.status(200).json({
         status: 200,
-        message: `Get book with name = ${data.name} successfully`,
+        message: `Get book with id = ${data.id} successfully`,
         result: {
-          data,
+          data: [data],
         },
       });
     } catch {
       return {
         status: 400,
         message: "Find book failed",
+      };
+    }
+  }
+
+  async getNewestBooks(response: Response) {
+    try {
+      const data = await this.prisma.book.findMany({
+        take: 10,
+        include: {
+          author: true,
+          publisher: true,
+        },
+      });
+      return response.status(200).json({
+        status: 200,
+        message: `Get newest books successfully`,
+        result: {
+          data,
+        },
+      });
+    } catch (error) {
+      return {
+        status: 400,
+        message: "Get newest book failed",
       };
     }
   }

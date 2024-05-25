@@ -32,6 +32,7 @@ CREATE TABLE `Book` (
     `available_quantity` INTEGER NOT NULL,
     `year_of_publication` INTEGER NOT NULL,
     `image_url` VARCHAR(191) NOT NULL,
+    `date_added` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `author_id` INTEGER NOT NULL,
     `publisher_id` INTEGER NOT NULL,
 
@@ -70,8 +71,8 @@ CREATE TABLE `Discount` (
     `name` VARCHAR(191) NOT NULL,
     `value` INTEGER NOT NULL,
     `number_of_uses_remaining` INTEGER NOT NULL DEFAULT 1,
-    `start_date` DATETIME(3) NOT NULL,
-    `end_date` DATETIME(3) NOT NULL,
+    `start_time` DATETIME(3) NOT NULL,
+    `end_time` DATETIME(3) NOT NULL,
     `status` ENUM('ACTIVE', 'INACTIVE', 'EXPIRED') NOT NULL DEFAULT 'INACTIVE',
 
     PRIMARY KEY (`id`)
@@ -112,9 +113,16 @@ CREATE TABLE `Payment` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `payment_name` VARCHAR(191) NOT NULL,
     `payment_method` ENUM('COD', 'BANK_TRANSFER') NOT NULL DEFAULT 'COD',
-    `order_id` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `OrderRelPayment` (
+    `order_id` INTEGER NOT NULL,
+    `payment_id` INTEGER NOT NULL,
+
+    PRIMARY KEY (`order_id`, `payment_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -151,4 +159,7 @@ ALTER TABLE `UserRelDiscount` ADD CONSTRAINT `UserRelDiscount_user_id_fkey` FORE
 ALTER TABLE `UserRelDiscount` ADD CONSTRAINT `UserRelDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `OrderRelPayment` ADD CONSTRAINT `OrderRelPayment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderRelPayment` ADD CONSTRAINT `OrderRelPayment_payment_id_fkey` FOREIGN KEY (`payment_id`) REFERENCES `Payment`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

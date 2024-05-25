@@ -15,42 +15,52 @@ export class OrderService {
       order_details: CreateOrderDetailDto[];
       payment_id: number;
     },
-
     response: Response,
   ) {
-    console.log("🚀 ~ OrderService ~ order:", request);
+    console.log("🚀 ~ OrderService ~ order_details:", request.order_details);
     try {
-      // step 1: insert data to Order table
-      console.log("waiting order...");
-      const orderData = await this.prisma.order.create({
-        data: request.order,
-      });
-      console.log("waiting orderRel...");
+      // step 1: check the book in list book in order_details is available or not?
+      const isAvailable = await this.checkAvailable(request.order_details);
+      if (isAvailable) {
+        // step 2: insert data to Order table
+        console.log("waiting order...");
+        const orderData = await this.prisma.order.create({
+          data: request.order,
+        });
+        console.log("waiting orderRel...");
 
-      // step 2: insert data to OrderRelPayment tabel
-      const orderRelPaymentData = await this.prisma.orderRelPayment.create({
-        data: {
-          order_id: orderData.id,
-          payment_id: request.payment_id,
-        },
-      });
+        // step 3: insert data to OrderRelPayment tabel
+        const orderRelPaymentData = await this.prisma.orderRelPayment.create({
+          data: {
+            order_id: orderData.id,
+            payment_id: request.payment_id,
+          },
+        });
 
-      // step 3: insert data to orderDetails table
-      const orderDetailsData = await this.prisma.order_detail.createMany({
-        data: request.order_details.map((item) => ({
-          book_id: item.book_id,
-          order_id: orderData.id,
-          amount: item.amount,
-        })),
-      });
+        // step 4: insert data to orderDetails table
+        const orderDetailsData = await this.prisma.order_detail.createMany({
+          data: request.order_details.map((item) => ({
+            book_id: item.book_id,
+            order_id: orderData.id,
+            amount: item.amount,
+          })),
+        });
 
-      return response.status(200).json({
-        status: 200,
-        message: "Create new order was successed",
-        result: {
-          data: orderDetailsData,
-        },
-      });
+        return response.status(200).json({
+          status: 200,
+          message: "Create new order was successed",
+          result: {
+            data: orderDetailsData,
+          },
+        });
+      } else {
+        return response.status(200).json({
+          status: 400,
+          message:
+            "Some books is not available for now, please check book amount",
+          result: {},
+        });
+      }
     } catch (err) {
       console.log("[Error][CreateNewOrder]", err);
       return {
@@ -118,6 +128,36 @@ export class OrderService {
     }
   }
 
+  async getAllOrdersByUserId(id: number, response: Response) {
+    try {
+      const data = await this.prisma.order.findMany({
+        where: { user_id: id },
+        include: {
+          Order_detail: {
+            include: { book: true },
+          },
+          orderRelPayment: {
+            include: {
+              payment: true,
+            },
+          },
+        },
+      });
+      return response.status(200).json({
+        status: 200,
+        message: `Get all orders by user id = ${id} successfully`,
+        result: {
+          data,
+        },
+      });
+    } catch (error) {
+      return {
+        status: 400,
+        message: `Get order failed`,
+      };
+    }
+  }
+
   async update(id: number, updateOrderDto: UpdateOrderDto, response: Response) {
     try {
       const data = await this.prisma.order.update({
@@ -153,6 +193,73 @@ export class OrderService {
         status: 400,
         message: `Remove order failed`,
       };
+    }
+  }
+
+  async checkSpecificBookIsAvailable(orderDetails: {
+    book_id: number;
+    amount: number;
+  }) {
+    const data = await this.prisma.book.findFirst({
+      where: {
+        id: orderDetails.book_id,
+        available_quantity: {
+          gte: orderDetails.amount,
+        },
+      },
+    });
+
+    if (data && data.name) {
+      console.log("found");
+
+      return {
+        book_id: data.id,
+        name: data.name,
+        isAvailable: true,
+      };
+    } else {
+      console.log("not found");
+
+      return {
+        book_id: orderDetails.book_id,
+        name: "",
+        isAvailable: false,
+      };
+    }
+  }
+
+  async checkAvailable(order_details: CreateOrderDetailDto[]) {
+    try {
+      let books = [];
+      let isAvailableBook = true;
+
+      for (const orderDetailItem of order_details) {
+        let data = await this.checkSpecificBookIsAvailable(orderDetailItem);
+        books.push(data);
+      }
+
+      books.forEach((book) => {
+        if (!book.isAvailable) {
+          isAvailableBook = false;
+          return;
+        }
+      });
+
+      console.log("🚀 ~ OrderService ~ isAvailableBook:", isAvailableBook);
+      return isAvailableBook;
+
+      // if (isAvailableBook) {
+      //   return response.status(200).json({
+      //     status: 200,
+      //     message: "Is Available",
+      //     result: {},
+      //   });
+      // }
+    } catch (error) {
+      // return {
+      //   status: 400,
+      //   message: "Error when check...",
+      // };
     }
   }
 }

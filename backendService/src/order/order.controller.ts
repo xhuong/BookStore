@@ -34,10 +34,27 @@ export class OrderController {
   // create(@Body() createOrderDto: CreateOrderDto, @Res() response: Response) {
   //   return this.orderService.create(createOrderDto, response);
   // }
+  // @Post()
+  // checkAvailable(
+  //   @Body()
+  //   requestBody: {
+  //     order: CreateOrderDto;
+  //     order_details: CreateOrderDetailDto[];
+  //     payment_id: number;
+  //   },
+  //   @Res() response: Response,
+  // ) {
+  //   return this.orderService.checkAvailable(requestBody, response);
+  // }
 
   @Get()
   findAll(@Res() response: Response) {
     return this.orderService.findAll(response);
+  }
+
+  @Get("user/:id")
+  getAllOrdersByUserId(@Param("id") id: string, @Res() response: Response) {
+    return this.orderService.getAllOrdersByUserId(+id, response);
   }
 
   @Get(":id")

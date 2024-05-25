@@ -9,7 +9,7 @@ import {
   Res,
 } from "@nestjs/common";
 import { BookService } from "./book.service";
-import { CreateBookDto } from "./dto/create-book.dto";
+import { CreateBookDto, PayloadSearchBookDto } from "./dto/create-book.dto";
 import { UpdateBookDto } from "./dto/update-book.dto";
 import { Response } from "express";
 
@@ -18,18 +18,23 @@ export class BookController {
   constructor(private readonly bookService: BookService) {}
 
   @Post()
+  findAll(@Body() payload: PayloadSearchBookDto, @Res() response: Response) {
+    return this.bookService.findAll(payload, response);
+  }
+
+  @Post("create")
   create(@Body() createBookDto: CreateBookDto, @Res() response: Response) {
     return this.bookService.create(createBookDto, response);
   }
 
-  @Get()
-  findAll(@Res() response: Response) {
-    return this.bookService.findAll(response);
+  @Get("newest")
+  getNewestBooks(@Res() response: Response) {
+    return this.bookService.getNewestBooks(response);
   }
 
-  @Get(":name")
-  findOne(@Param("name") id: string, @Res() response: Response) {
-    return this.bookService.findOne(id, response);
+  @Get(":id")
+  findOne(@Param("id") id: number, @Res() response: Response) {
+    return this.bookService.findOne(+id, response);
   }
 
   @Patch(":id")
